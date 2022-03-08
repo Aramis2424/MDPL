@@ -24,7 +24,7 @@ HelloMessage DB 13 ;курсор поместить в нач. строки
 			 DB '$' ;ограничитель для функции DOS
 DataS ENDS
 
-Code SEGMENT WORD 'CODE'
+Code SEGMENT PARA 'CODE'
 		ASSUME CS:Code, DS:DataS
 DispMsg:
 		mov AX,DataS ;загрузка в AX адреса сегмента данных
