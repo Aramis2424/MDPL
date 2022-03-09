@@ -16,8 +16,8 @@ CODE_SEG_1 SEGMENT PARA 'CODE'
 		mov DS, AX
 		
 		mov AH, 01h
-		int 21h		;введеное число в AL
-		mov number, Al		;переместить в number
+		int 21h ;введеное число в AL
+		mov number, Al ;переместить в number
 		
 		jmp print
 		
