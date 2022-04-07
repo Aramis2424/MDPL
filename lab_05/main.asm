@@ -1,6 +1,5 @@
 ;прямоугольная цифровая  
-;переставить местами строки с наибольшим и
-;наименьшим элементами
+;удалить строку с наибольшей суммой элементов
 
 seg_stack SEGMENT PARA STACK 'STACK'
     DB 100 DUP (0)
@@ -20,8 +19,8 @@ seg_data SEGMENT PARA 'DATA'
 	ROW DB 0
 	COL DB 0
 	MTR DB 9 * 9 DUP (0)
-	MAX_I DW 1 DUP (0)
-	MIN_I DW 1 DUP (0)
+	STR_INDEX DB 0
+	STR_SUM DB 0
 seg_data ENDS	
 
 seg_code_main SEGMENT PARA 'CODE'	
@@ -107,47 +106,42 @@ seg_code_main SEGMENT PARA 'CODE'
 				LOOP input_row
 				
 				
-		; find_max_min: 
-			; MOV SI, 0 ;SI=0
-			
-			; XOR AX, AX
-			; MOV AL, ES:COL ;AX=0-COL         ;Тут прикол как раз в том, что col занимает байт, а al - 2 байта, поэтому так
-			
-			; XOR DI, DI ;DI=0
-			; MOV DI, AX ;DI=0-COL
-			
-			; XOR CX, CX
-			; MOV CL, ES:ROW ;cl-кол-во строк
-			
-			; XOR AX, AX
-			; XOR DX, DX
-			; MOV AL, ES:MTR[SI] ;в ал - элемент 0;0
-			; MOV DL, ES:MTR[SI] ;в дл - элемент 0;0
-			
-			; find_row_max_min: ;цикл - начало
-				; PUSH CX ;финт, что и при вводе
-				; MOV CL, ES:COL
-				; MOV BX, 0
-				; find_col_max_min: ;цикл - начало
-					; CMP AL, ES:MTR[SI][BX] ;сравнение текущего максимума с текущим элементом
-					; JLE next_max
-					; CMP DL, ES:MTR[SI][BX] ;сравнение текущего минимума с текущим элементом
-					; JGE next_min
-					; JMP next
-				; next_max:
-					; MOV AL, ES:MTR[SI][BX] ;обновление текущего максимума
-					; MOV ES:MAX_I, SI ;сохраняем новер строки с наибольшиим элементом
-					; JMP next 
-				; next_min:
-					; MOV DL, ES:MTR[SI][BX] ;обновление текущего минимума
-					; MOV ES:MIN_I, SI	
+		find_max_str_sum: 
+			XOR AX, AX
+			XOR DX, DX
 
-				; next:
-					; INC BX
-					; LOOP find_col_max_min ;цикл - конец
-				; POP CX
-				; ADD SI, DI ;по сути просто si+9 т.е. следующая строка
-				; LOOP find_row_max_min ;цикл - конец
+			XOR CX, CX
+			MOV CL, ES:ROW ;cl-кол-во строк
+			
+			XOR SI, SI
+			traversal_str: ;начало цикла
+				PUSH CX 
+				MOV CL, ES:COL
+				XOR BX, BX
+				traversal_col: ;цикл - начало
+					ADD DL, ES:MTR[SI][BX]
+					INC BX
+					LOOP traversal_col
+					
+				CMP DL, ES:STR_SUM
+				JLE next
+				JG upgrade_str_sum
+				upgrade_str_sum:
+					MOV ES:STR_SUM, DL
+					MOV AX, SI
+					MOV ES:STR_INDEX, AL
+				next:
+				POP CX
+				XOR DX, DX
+				ADD SI, 9 ;по сути просто si+9 т.е. следующая строка
+				LOOP traversal_str
+		CALL print_new_line
+		MOV DL, ES:STR_INDEX
+		CALL print_num
+		CALL print_new_line
+		MOV DL, ES:STR_SUM
+		CALL print_num
+		CALL print_new_line
 				
 		; swap_lines:
 			; XOR CX, CX
