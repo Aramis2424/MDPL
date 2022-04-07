@@ -105,7 +105,10 @@ seg_code_main SEGMENT PARA 'CODE'
 				POP CX ;получаем из стека сохраненное значение кол-ва строк
 				ADD SI, 9 ;переходим на новую строку
 				LOOP input_row
-				
+		
+		MOV CL, ES:ROW
+		CMP CL, 1
+		JE one_line
 				
 		find_max_str_sum: 
 			XOR AX, AX
@@ -122,43 +125,31 @@ seg_code_main SEGMENT PARA 'CODE'
 				XOR BX, BX
 				INC DI
 				find_max_str_sum_col: ;цикл - начало
-					ADD DL, ES:MTR[SI][BX]
+					ADD DL, ES:MTR[SI][BX] ;накапливаем сумму
 					INC BX
 					LOOP find_max_str_sum_col
 					
 				CMP DL, ES:STR_SUM
 				JLE next
-				JG upgrade_str_sum
+				JG upgrade_str_sum ;обновляем максимумальную сумму
 				upgrade_str_sum:
-					MOV ES:STR_SUM, DL
+					MOV ES:STR_SUM, DL ;сумма
 					MOV AX, SI
-					MOV ES:ELEM_INDEX, AL
+					MOV ES:ELEM_INDEX, AL ;;номер первого элемента в  строке с макс суммой
 					MOV AX, DI
-					MOV ES:STR_INDEX, AL
+					MOV ES:STR_INDEX, AL ;индекс строки с максимальной суммой
 				next:
 				POP CX
 				XOR DX, DX
-				ADD SI, 9 ;по сути просто si+9 т.е. следующая строка
+				ADD SI, 9 
 				LOOP find_max_str_sum_str
-		; CALL print_new_line
-		; MOV DL, ES:STR_INDEX
-		; CALL print_num
-		; CALL print_new_line
-		; MOV DL, ES:ELEM_INDEX
-		; CALL print_num
-		; CALL print_new_line
-		; MOV DL, ES:STR_SUM
-		; CALL print_num
-		; CALL print_new_line
+
 		del_str:
 			XOR CX, CX
 			XOR BX, BX
 			
 			MOV CL, ES:ROW
-			CMP CL, 1
-			JE one_line
-			
-			SUB CL, ES:STR_INDEX
+			SUB CL, ES:STR_INDEX ;сколько строк под строкой, которую нужно удаоить
 			
 			CMP CL, 0
 			JE last_line
@@ -179,22 +170,10 @@ seg_code_main SEGMENT PARA 'CODE'
 				ADD SI, 9
 				LOOP del_str_str
 				
-		; swap_lines:
-			; XOR CX, CX
-			; MOV CL, ES:COL
-			; MOV SI, ES:MAX_I ;в si - индекс строки с максимальным элементом (типо 9*n + 0)
-			; MOV BX, ES:MIN_I ;в bx - индекс строки с минимальным элемнетом
-			; swap: ;цикл - начало   идем по столбцам
-				; XCHG AL, ES:MTR[SI] ; стандратный обмент через tmp
-				; XCHG AL, ES:MTR[BX] ;
-				; XCHG AL, ES:MTR[SI] ;
-				; INC SI
-				; INC BX
-				; LOOP swap ;цикл - конец
-		last_line:
+		last_line: ;если нужно удалить последнюю строку
 			SUB ES:ROW, 1
 			JMP print_mtr
-		one_line: 
+		one_line: ;если в матрице только одна строка
 			XOR SI, SI
 			XOR BX, BX
 			MOV CL, ES:COL
