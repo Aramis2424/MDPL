@@ -19,7 +19,8 @@ seg_data SEGMENT PARA 'DATA'
 	ROW DB 0
 	COL DB 0
 	MTR DB 9 * 9 DUP (0)
-	STR_INDEX DB 0
+	STR_INDEX DB 0 ;номер строки, в которой находится наибольшая сумма элементов
+	ELEM_INDEX DB 0 ;номер первого элемента в такой строке
 	STR_SUM DB 0
 seg_data ENDS	
 
@@ -114,14 +115,16 @@ seg_code_main SEGMENT PARA 'CODE'
 			MOV CL, ES:ROW ;cl-кол-во строк
 			
 			XOR SI, SI
-			traversal_str: ;начало цикла
+			XOR DI, DI
+			find_max_str_sum_str: ;начало цикла
 				PUSH CX 
 				MOV CL, ES:COL
 				XOR BX, BX
-				traversal_col: ;цикл - начало
+				INC DI
+				find_max_str_sum_col: ;цикл - начало
 					ADD DL, ES:MTR[SI][BX]
 					INC BX
-					LOOP traversal_col
+					LOOP find_max_str_sum_col
 					
 				CMP DL, ES:STR_SUM
 				JLE next
@@ -129,19 +132,52 @@ seg_code_main SEGMENT PARA 'CODE'
 				upgrade_str_sum:
 					MOV ES:STR_SUM, DL
 					MOV AX, SI
+					MOV ES:ELEM_INDEX, AL
+					MOV AX, DI
 					MOV ES:STR_INDEX, AL
 				next:
 				POP CX
 				XOR DX, DX
 				ADD SI, 9 ;по сути просто si+9 т.е. следующая строка
-				LOOP traversal_str
-		CALL print_new_line
-		MOV DL, ES:STR_INDEX
-		CALL print_num
-		CALL print_new_line
-		MOV DL, ES:STR_SUM
-		CALL print_num
-		CALL print_new_line
+				LOOP find_max_str_sum_str
+		; CALL print_new_line
+		; MOV DL, ES:STR_INDEX
+		; CALL print_num
+		; CALL print_new_line
+		; MOV DL, ES:ELEM_INDEX
+		; CALL print_num
+		; CALL print_new_line
+		; MOV DL, ES:STR_SUM
+		; CALL print_num
+		; CALL print_new_line
+		del_str:
+			XOR CX, CX
+			XOR BX, BX
+			
+			MOV CL, ES:ROW
+			CMP CL, 1
+			JE one_line
+			
+			SUB CL, ES:STR_INDEX
+			
+			CMP CL, 0
+			JE last_line
+			
+			MOV BL, ES:ELEM_INDEX
+			MOV SI, BX
+			
+			del_str_str: ;начало цикла
+				PUSH CX 
+				MOV CL, ES:COL
+				XOR BX, BX
+				del_str_col: ;начало цикла
+					MOV DL, ES:MTR[SI+9][BX]
+					MOV ES:MTR[SI][BX], DL
+					INC BX
+					LOOP del_str_col
+				POP CX
+				ADD SI, 9
+				LOOP del_str_str
 				
 		; swap_lines:
 			; XOR CX, CX
@@ -155,6 +191,17 @@ seg_code_main SEGMENT PARA 'CODE'
 				; INC SI
 				; INC BX
 				; LOOP swap ;цикл - конец
+		last_line:
+			SUB ES:ROW, 1
+			JMP print_mtr
+		one_line: 
+			XOR SI, SI
+			XOR BX, BX
+			MOV CL, ES:COL
+			zero_line:
+				MOV ES:MTR[SI][BX], 0
+				INC BX
+				LOOP zero_line
 		
 		print_mtr: ;вывод матрицы
 			MOV DX, OFFSET ES:MSG_RES
