@@ -113,59 +113,64 @@ main:
 			ADD SI, 9 ;переходим на новую строку
 			LOOP input_row ;конец цикла (здесь на один уменьшается кол-во строк, которые еще нужно прочитать)
 			
-	; find_max_min: 
-		; MOV SI, 0
-		
-		; XOR AX, AX
-		; MOV AL, ES:COL
-		; XOR DI, DI
-		; MOV DI, AX
-		
-		; XOR CX, CX
-		; MOV CL, ES:ROW
-		
-		; XOR AX, AX
-		; XOR DX, DX
-		; MOV AL, ES:MTR[SI]
-		; MOV DL, ES:MTR[SI]
-		
-		; find_row_max_min:
-			; PUSH CX
-			; MOV CL, ES:COL
-			; MOV BX, 0
-			; find_col_max_min:
-				; CMP AL, ES:MTR[SI][BX]
-				; JLE next_max
-				; CMP DL, ES:MTR[SI][BX]
-				; JGE next_min
-				; JMP next
-			; next_max:
-				; MOV AL, ES:MTR[SI][BX]
-				; MOV ES:MAX_I, SI
-				; JMP next 
-			; next_min:
-				; MOV DL, ES:MTR[SI][BX]
-				; MOV ES:MIN_I, SI	
-
-			; next:
-				; INC BX
-				; LOOP find_col_max_min
-			; POP CX
-			; ADD SI, DI
-			; LOOP find_row_max_min
 			
-	; swap_lines:
-		; XOR CX, CX
-		; MOV CL, ES:COL
-		; MOV SI, ES:MAX_I
-		; MOV BX, ES:MIN_I
-		; swap:
-			; XCHG AL, ES:MTR[SI]
-			; XCHG AL, ES:MTR[BX]
-			; XCHG AL, ES:MTR[SI]
-			; INC SI
-			; INC BX
-			; LOOP swap
+			
+			
+			
+	find_max_min: 
+		MOV SI, 0 ;SI=0
+		
+		XOR AX, AX
+		MOV AL, ES:COL ;AX=0-COL         ;Тут прикол как раз в том, что col занимает байт, а al - 2 байта, поэтому так
+		
+		XOR DI, DI ;DI=0
+		MOV DI, AX ;DI=0-COL
+		
+		XOR CX, CX
+		MOV CL, ES:ROW ;cl-кол-во строк
+		
+		XOR AX, AX
+		XOR DX, DX
+		MOV AL, ES:MTR[SI] ;в ал - элемент 0;0
+		MOV DL, ES:MTR[SI] ;в дл - элемент 0;0
+		
+		find_row_max_min: ;цикл - начало
+			PUSH CX ;финт, что и при вводе
+			MOV CL, ES:COL
+			MOV BX, 0
+			find_col_max_min: ;цикл - начало
+				CMP AL, ES:MTR[SI][BX] ;сравнение текущего максимума с текущим элементом
+				JLE next_max
+				CMP DL, ES:MTR[SI][BX] ;сравнение текущего минимума с текущим элементом
+				JGE next_min
+				JMP next
+			next_max:
+				MOV AL, ES:MTR[SI][BX] ;обновление текущего максимума
+				MOV ES:MAX_I, SI ;сохраняем новер строки с наибольшиим элементом
+				JMP next 
+			next_min:
+				MOV DL, ES:MTR[SI][BX] ;обновление текущего минимума
+				MOV ES:MIN_I, SI	
+
+			next:
+				INC BX
+				LOOP find_col_max_min ;цикл - конец
+			POP CX
+			ADD SI, DI ;по сути просто si+9 т.е. следующая строка
+			LOOP find_row_max_min ;цикл - конец
+			
+	swap_lines:
+		XOR CX, CX
+		MOV CL, ES:COL
+		MOV SI, ES:MAX_I ;в si - индекс строки с максимальным элементом (типо 9*n + 0)
+		MOV BX, ES:MIN_I ;в bx - индекс строки с минимальным элемнетом
+		swap: ;цикл - начало   идем по столбцам
+			XCHG AL, ES:MTR[SI] ; стандратный обмент через tmp
+			XCHG AL, ES:MTR[BX] ;
+			XCHG AL, ES:MTR[SI] ;
+			INC SI
+			INC BX
+			LOOP swap ;цикл - конец
 	
 	print_mtr: ;вывод матрицы
 		MOV DX, OFFSET ES:MSG_RES ;print('result')
