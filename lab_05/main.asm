@@ -25,7 +25,7 @@ seg_data SEGMENT PARA 'DATA'
 seg_data ENDS	
 
 seg_code_main SEGMENT PARA 'CODE'	
-    ASSUME CS:seg_code_main, DS:seg_text, SS:seg_stack
+    ASSUME CS:seg_code_main, DS:seg_text, ES:seg_data, SS:seg_stack
 		
 	input_num:
 		MOV AH, 01h
@@ -65,37 +65,37 @@ seg_code_main SEGMENT PARA 'CODE'
 		MOV AX, seg_text
 		MOV DS, AX
 
-		MOV DX, OFFSET ES:MSG_ROW ;сообщение на ввод строки
+		MOV DX, OFFSET MSG_ROW ;сообщение на ввод строки
 		CALL print_text
 		CALL input_num ;ввод числа строк
-		MOV ES:ROW, AL 
-		CMP ES:ROW, 0 ;проверка на ноль
+		MOV ROW, AL 
+		CMP ROW, 0 ;проверка на ноль
 		JE error_exit 
 		CALL print_new_line
 		
-		MOV DX, OFFSET ES:MSG_COL ;то же, что и для row
+		MOV DX, OFFSET MSG_COL ;то же, что и для row
 		CALL print_text
 		CALL input_num
-		MOV ES:COL, AL
-		CMP ES:COL, 0
+		MOV COL, AL
+		CMP COL, 0
 		JE error_exit
 		CALL print_new_line
 		
-		MOV DX, OFFSET ES:MSG_MTR ;сообщение на ввод матрицы
+		MOV DX, OFFSET MSG_MTR ;сообщение на ввод матрицы
 		CALL print_text
 		CALL print_new_line
 		
 		input_mtr: ;ввод матрицы
 			XOR CX, CX 
-			MOV CL, ES:ROW ;переносим кол-во строк в cl
+			MOV CL, ROW ;переносим кол-во строк в cl
 			XOR SI, SI
 			input_row: ;начало цикла
 				PUSH CX ;Сохраняем кол-во строк, которые еще нужно прочитать, отправляя его в стек
-				MOV CL, ES:COL ;переносим кол-во столбцов в cl
+				MOV CL, COL ;переносим кол-во столбцов в cl
 				XOR BX, BX 
 				input_col: ;начало цикла
 					CALL input_num ;ввод элемента матрицы
-					MOV ES:MTR[SI][BX], AL 
+					MOV MTR[SI][BX], AL 
 					
 					INC BX
 					CALL print_space
@@ -106,7 +106,7 @@ seg_code_main SEGMENT PARA 'CODE'
 				ADD SI, 9 ;переходим на новую строку
 				LOOP input_row
 		
-		MOV CL, ES:ROW
+		MOV CL, ROW
 		CMP CL, 1
 		JE one_line
 				
@@ -115,29 +115,29 @@ seg_code_main SEGMENT PARA 'CODE'
 			XOR DX, DX
 
 			XOR CX, CX
-			MOV CL, ES:ROW ;cl-кол-во строк
+			MOV CL, ROW ;cl-кол-во строк
 			
 			XOR SI, SI
 			XOR DI, DI
 			find_max_str_sum_str: ;начало цикла
 				PUSH CX 
-				MOV CL, ES:COL
+				MOV CL, COL
 				XOR BX, BX
 				INC DI
 				find_max_str_sum_col: ;цикл - начало
-					ADD DL, ES:MTR[SI][BX] ;накапливаем сумму
+					ADD DL, MTR[SI][BX] ;накапливаем сумму
 					INC BX
 					LOOP find_max_str_sum_col
 					
-				CMP DL, ES:STR_SUM
+				CMP DL, STR_SUM
 				JLE next
 				JG upgrade_str_sum ;обновляем максимумальную сумму
 				upgrade_str_sum:
-					MOV ES:STR_SUM, DL ;сумма
+					MOV STR_SUM, DL ;сумма
 					MOV AX, SI
-					MOV ES:ELEM_INDEX, AL ;;номер первого элемента в  строке с макс суммой
+					MOV ELEM_INDEX, AL ;;номер первого элемента в  строке с макс суммой
 					MOV AX, DI
-					MOV ES:STR_INDEX, AL ;индекс строки с максимальной суммой
+					MOV STR_INDEX, AL ;индекс строки с максимальной суммой
 				next:
 				POP CX
 				XOR DX, DX
@@ -148,22 +148,22 @@ seg_code_main SEGMENT PARA 'CODE'
 			XOR CX, CX
 			XOR BX, BX
 			
-			MOV CL, ES:ROW
-			SUB CL, ES:STR_INDEX ;сколько строк под строкой, которую нужно удаоить
+			MOV CL, ROW
+			SUB CL, STR_INDEX ;сколько строк под строкой, которую нужно удаоить
 			
 			CMP CL, 0
 			JE last_line
 			
-			MOV BL, ES:ELEM_INDEX
+			MOV BL, ELEM_INDEX
 			MOV SI, BX
 			
 			del_str_str: ;начало цикла
 				PUSH CX 
-				MOV CL, ES:COL
+				MOV CL, COL
 				XOR BX, BX
 				del_str_col: ;начало цикла
-					MOV DL, ES:MTR[SI+9][BX]
-					MOV ES:MTR[SI][BX], DL
+					MOV DL, MTR[SI+9][BX]
+					MOV MTR[SI][BX], DL
 					INC BX
 					LOOP del_str_col
 				POP CX
@@ -171,31 +171,31 @@ seg_code_main SEGMENT PARA 'CODE'
 				LOOP del_str_str
 				
 		last_line: ;если нужно удалить последнюю строку
-			SUB ES:ROW, 1
+			SUB ROW, 1
 			JMP print_mtr
 		one_line: ;если в матрице только одна строка
 			XOR SI, SI
 			XOR BX, BX
-			MOV CL, ES:COL
+			MOV CL, COL
 			zero_line:
-				MOV ES:MTR[SI][BX], 0
+				MOV MTR[SI][BX], 0
 				INC BX
 				LOOP zero_line
 		
 		print_mtr: ;вывод матрицы
-			MOV DX, OFFSET ES:MSG_RES
+			MOV DX, OFFSET MSG_RES
 			CALL print_text
 			CALL print_new_line
 			
 			XOR CX, CX
-			MOV CL, ES:ROW
+			MOV CL, ROW
 			XOR SI, SI
 			print_row:
 				PUSH CX 
-				MOV CL, ES:COL
+				MOV CL, COL
 				XOR BX, BX
 				print_col: 
-					MOV DL, ES:MTR[SI][BX]
+					MOV DL, MTR[SI][BX]
 					CALL print_num
 					INC BX
 					CALL print_space
@@ -211,7 +211,7 @@ seg_code_main SEGMENT PARA 'CODE'
 		
 		error_exit:
 			CALL print_new_line
-			MOV DX, OFFSET ES:MSG_ERR ;печатаем сообщение об ошибке
+			MOV DX, OFFSET MSG_ERR ;печатаем сообщение об ошибке
 			CALL print_text
 			MOV AH, 4Ch	;завершаем
 
