@@ -1,77 +1,65 @@
-;прямоугольная цифровая  
-;удалить строку с наибольшей суммой элементов
+;ввод беззнаковое в 2 с/с
+;1-е выводимое беззнаковое в 10 с/с
+;2-е выводимое знаковое в 16 с/с
 
-seg_stack SEGMENT PARA STACK 'STACK'
-    DB 100 DUP (0)
-seg_stack ENDS
+extrn print_text: near
+extrn print_newline: near
+extrn input_choice: near
+public error_menu
+; extrn print_text: near
+; extrn print_text: near
+; extrn print_text: near
 
+seg_stack segment para stack 'stack'
+    db 100 dup (?)
+seg_stack ends
 
-seg_text SEGMENT PARA 'DATA'
-    MSG_ROW DB 'Input number of rows: $'
-	MSG_COL DB 'Input number of columns: $'
-	MSG_MTR DB 'Input elements of matrix: $'
-	MSG_RES DB 'The result: $'
-	MSG_ERR DB 'Error!$'
-seg_text ENDS
+seg_menu segment para 'data'
+    msg_menu db 'Menu:', 13, 10
+			 db ' 1 - Input unsigned binary number', 13, 10
+			 db ' 2 - Print unsigned decimal number', 13, 10 
+			 db ' 3 - Print signed hexadecimal number', 13, 10
+			 db ' 0 - Exit ', 13, 10, 10
+			 db 'Input command: $'
+	msg_error db 'There is not such menu item!', 13, 10, 'Please try again!', '$'
+	msg_exit db 'End program!', 13, 10, '$'
+	choice dw exit; input_proc, output_proc, bin_to_undec_proc, bin_to_hex
+seg_menu ends
 
+seg_code segment para public 'code'	
+    assume cs:seg_code, ds:seg_menu, ss:seg_stack
 
-seg_data SEGMENT PARA 'DATA'
-	ROW DB 0
-	COL DB 0
-	MTR DB 9 * 9 DUP (0)
-	STR_INDEX DB 0 ;номер строки, в которой находится наибольшая сумма элементов
-	ELEM_INDEX DB 0 ;номер первого элемента в такой строке
-	STR_SUM DB 0
-seg_data ENDS	
+	exit proc
+		mov dx, offset msg_exit
+		call print_text
+		mov ah, 4ch						
+		int 21h
+	exit endp
 
-seg_code_main SEGMENT PARA 'CODE'	
-    ASSUME CS:seg_code_main, DS:seg_text, ES:seg_data, SS:seg_stack
-		
-	input_num:
-		MOV AH, 01h
-		INT 21h
-		SUB AL, 30h ;делаем из строки число
-		RET
+	error_menu proc
+		call print_newline
+		mov dx, offset msg_error ;сообщение об ошибке
+		call print_text
+		call print_newline
+		jmp print_menu_loop
+	error_menu endp
 
-	print_new_line:
-		MOV AH, 02h
-		MOV DL, 0Dh  ;LF Line Feed
-		INT 21h
-		MOV DL, 0Ah  ;CR Carriage Return
-		INT 21h
-		RET
-
-	print_space:
-		MOV AH, 02h
-		MOV DL, 20h
-		INT 21h
-		RET
-
-	print_num:
-		ADD DL, 30h ;делаем из числа строку
-		MOV AH, 02h
-		INT 21h
-		RET
-
-	print_text:
-		MOV AH, 09h
-		INT 21h
-		RET
+	print_menu proc
+		mov dx, offset msg_menu
+		call print_text
+		ret
+	print_menu endp
 
 	main:
-		MOV AX, seg_data
-		MOV ES, AX
-		
-		MOV AX, seg_text
-		MOV DS, AX
-		
-		error_exit:
-			CALL print_new_line
-			MOV DX, OFFSET MSG_ERR ;печатаем сообщение об ошибке
-			CALL print_text
-			MOV AH, 4Ch	;завершаем
-
-			INT 21h
+		mov ax, seg_menu
+		mov ds, ax
+			
+		print_menu_loop:
+			call print_menu
+			call input_choice
+			call print_newline
+			call choice[si]
+			jmp print_menu_loop
 	
-seg_code_main ENDS
-END main
+seg_code ends
+end main
