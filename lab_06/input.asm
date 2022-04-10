@@ -86,8 +86,17 @@ seg_code segment para public 'code'
 				xor cx, cx
 				mov cl, al ;записали в cx
 				
-				shl bx, 1
-				add bx, cx
+				sal bx, 1
+				mov ax, bx
+				sal bx, 1
+				sal bx, 1
+				add bx, ax
+
+				add bx, cx	; к числу прибавляю введенную цифру
+
+				
+				;shl bx, 1
+				;add bx, cx
 
 			jmp input_num_loop	;продолжаем ввод
 		
@@ -100,9 +109,9 @@ seg_code segment para public 'code'
 			mov number, bx
 		
 		
-		; call print_newline
-		; mov dx, offset number
-		; call print_text
+		call print_newline
+		mov dx, offset number
+		call print_text
 		
 		
 		ret
@@ -112,36 +121,110 @@ seg_code ends
 end
 
 
-INPUT_LOOP:
-	MOV  AH, 8
-	INT  21H
+
+;DIGIT:
+;		MOV AH, 1	; для ввода числа по цифрам
+;		INT 21h		;
+;		CMP AL, 13 	; 13 - это нажатый энтер, если нажат энтер, то выход из подпрограммы
+;		JE EXITINPUT	; если нажат энтер, то есть ZF == 1
+;		MOV CL, AL	; в CL помещаю код считанный цифры
+;		SUB CL, '0'	; отнимаю 30 из CL
+		; SAL BX, 1
+		; MOV AX, BX
+		; SAL BX, 1
+		; SAL BX, 1
+		; ADD BX, AX
+
+		; ADD BX, CX	; к числу прибавляю введенную цифру
+		; JMP DIGIT	; ввожу цифру до энтер
+	; EXITINPUT:		; если ввели энтер 
+	; MOV NUMBER, BX	; помещаю число в отведенную память
+	; RET
 	
-	CMP  AL, 13
-	JE   INPUT_END
+	
+	
+	
+; PUBLIC INPUT
+
+; DSEG	SEGMENT PARA PUBLIC 'DATA'
+	; ENT		DB	'>> $'
+	; NLINE	DB	10, 13, '$'
+; DSEG	ENDS
+
+; CSEG	SEGMENT PARA PUBLIC 'CODE'
+	; ASSUME CS:CSEG
 		
-	CMP  AL, 45
-	JE   NEG_NUM
+; INPUT PROC NEAR
+	; MOV  AH, 9
+	; MOV  DX, OFFSET ENT
+	; INT  21H
+	
+	; XOR  BX, BX
+	; XOR  CX, CX
+	
+
+; INPUT_LOOP:
+	; MOV  AH, 8 ;ввод без эха
+	; INT  21H
+	
+	; CMP  AL, 13       ;enter
+	; JE   INPUT_END		
 		
-	CMP  AL, '0'
-	JB   INPUT_LOOP
-	CMP  AL, '9'
-	JA   INPUT_LOOP
+	; CMP  AL, 45		минус
+	; JE   NEG_NUM
 		
-	MOV  AH, 2
-	MOV  DL, AL
-	INT  21H
+	; CMP  AL, '0' ;0
+	; JB   INPUT_LOOP
+	
+	; CMP  AL, '9' ;9
+	; JA   INPUT_LOOP
 		
-	MOV  CL, AL
-	MOV  AX, BX
+	; MOV  AH, 2 ;ввод с эхом
+	; MOV  DL, AL
+	; INT  21H
 		
-	SHL  AX, 1
-	SHL  AX, 1
-	ADD  AX, BX
-	SHL  AX, 1
+	; MOV  CL, AL
+	; MOV  AX, BX
 		
-	MOV  BL, CL
-	SUB  BL, '0'
-	XOR  BH, BH
-	ADD  BX, AX
+	; SHL  AX, 1
+	; SHL  AX, 1
+	; ADD  AX, BX
+	; SHL  AX, 1
 		
-	JMP  INPUT_LOOP
+	; MOV  BL, CL
+	; SUB  BL, '0'
+	; XOR  BH, BH
+	; ADD  BX, AX
+		
+	; JMP  INPUT_LOOP
+		
+; NEG_NUM:
+	; MOV  AH, 2
+	; MOV  DL, AL
+	; INT  21H
+		
+	; MOV  CH, 1
+		
+	; JMP  INPUT_LOOP
+		
+; INPUT_END:
+	; MOV  AH, 9
+	; MOV  DX, OFFSET NLINE
+	; INT  21H
+		
+	; CMP  CH, 1
+	; JNE  SCAN_END
+		
+	; NEG  BX
+		
+; SCAN_END:
+	; XOR  DH, DH
+	; MOV  DL, CH
+	; MOV  AX, BX
+		
+	; RET
+		
+; INPUT ENDP
+
+; CSEG	ENDS
+; END
