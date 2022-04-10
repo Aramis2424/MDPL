@@ -5,16 +5,17 @@
 extrn print_text: near
 extrn print_newline: near
 extrn input_choice: near
+extrn input_unbin: near
+; extrn print_text: near
+; extrn print_text: near
 public error_menu
-; extrn print_text: near
-; extrn print_text: near
-; extrn print_text: near
+public print_menu_loop
 
 seg_stack segment para stack 'stack'
     db 100 dup (?)
 seg_stack ends
 
-seg_menu segment para 'data'
+seg_data segment para public 'data'
     msg_menu db 'Menu:', 13, 10
 			 db ' 1 - Input unsigned binary number', 13, 10
 			 db ' 2 - Print unsigned decimal number', 13, 10 
@@ -23,11 +24,11 @@ seg_menu segment para 'data'
 			 db 'Input command: $'
 	msg_error db 'There is not such menu item!', 13, 10, 'Please try again!', '$'
 	msg_exit db 'End program!', 13, 10, '$'
-	choice dw exit; input_proc, output_proc, bin_to_undec_proc, bin_to_hex
-seg_menu ends
+	choice dw exit, input_unbin;, output_proc, bin_to_undec_proc, bin_to_hex
+seg_data ends
 
 seg_code segment para public 'code'	
-    assume cs:seg_code, ds:seg_menu, ss:seg_stack
+    assume cs:seg_code, ds:seg_data, ss:seg_stack
 
 	exit proc
 		mov dx, offset msg_exit
@@ -51,7 +52,7 @@ seg_code segment para public 'code'
 	print_menu endp
 
 	main:
-		mov ax, seg_menu
+		mov ax, seg_data
 		mov ds, ax
 			
 		print_menu_loop:
