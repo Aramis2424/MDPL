@@ -66,11 +66,9 @@ seg_code segment para public 'code'
 			
 			cmp al, 13 	;13 - символ enter - конец ввода
 			je end_input
-			
 			inc di
 			
 			sub al, 30h	;делаем число
-			
 			cmp al, 0
 			je right
 			cmp al, 1

@@ -3,9 +3,9 @@ public undec_number
 extrn number: word
 
 seg_data segment para public 'data'
-    undec_number db 4 dup('0'), '$'
+    undec_number db 5 dup('0'), '$'
 
-    mask16 dw 9
+    mask10 dw 15
 seg_data ends
 
 seg_code segment para public 'code'
@@ -13,26 +13,39 @@ assume cs:seg_code, ds:seg_data
 
 bin_to_undec proc
     mov ax, number
-	;mov undec_number, al
-	;ret
 
     mov bx, 4
+	mov cx, 10
     trans_shex:
-        mov dx, ax
+		xor	dx,dx          ; Обнуляем DX (для деления)
+		div	cx             ; Делим DX:AX на CX (10),
+                                       ; Получаем в AX частное, в DX остаток
+		xchg	ax,dx          ; Меняем их местами (нас интересует остаток)
+		add	al,'0'         ; Получаем в AL символ десятичной цифры
+		
+		mov undec_number[bx], al
+		dec bx
+		
+		xchg	ax,dx          ; Восстанавливаем AX (частное)
+		or	ax,ax          ; Сравниваем AX с 0
+		jne	trans_shex         ; Если не ноль, то повторяем
+		;xor dx, dx
+		;div cx
+        ;mov dx, ax
 
-        and dx, mask16
+        ;and dx, mask10
 
-        add dl, '0'
+        ;add dl, '0'
 
-        mov undec_number[bx], dl
+        ;mov undec_number[bx], dl
 
-        mov cl, 5
-        sar ax, cl
+        ;mov cl, 4
+        ;sar ax, cl
 
-        dec bx
+        ;dec bx
 
-        cmp bx, -1
-        jne trans_shex
+        ;cmp bx, -1
+        ;jne trans_shex
 
     ret
 bin_to_undec endp
