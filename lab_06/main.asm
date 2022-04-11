@@ -7,7 +7,7 @@ extrn print_newline: near
 extrn input_choice: near
 extrn input_unbin: near
 extrn print_hex: near
-; extrn print_text: near
+extrn print_undec: near
 ; extrn print_text: near
 public error_menu
 public print_menu_loop
@@ -25,7 +25,7 @@ seg_data segment para public 'data'
 			 db 'Input command: $'
 	msg_error db 'There is not such menu item!', 13, 10, 'Please try again!', '$'
 	msg_exit db 'End program!', 13, 10, '$'
-	choice dw exit, input_unbin, print_hex;, bin_to_undec_proc
+	choice dw exit, input_unbin, print_undec, print_hex
 seg_data ends
 
 seg_code segment para public 'code'	

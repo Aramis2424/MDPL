@@ -6,12 +6,15 @@ public print_hex
 extrn hex_sign: byte
 extrn hex_number: byte
 extrn bin_to_hex: near
-; public print_new_line
+extrn undec_number: byte
+extrn bin_to_undec: near
+public print_undec
 ; public print_new_line
 ; public print_new_line
 
 seg_data segment para public 'data'
     msg_hex_num db 'Signed hexadecimal number: $'
+	msg_undec_num db 'Unsigned decimal number: $'
 seg_data ends
 
 seg_code segment para public 'code'	
@@ -76,6 +79,22 @@ seg_code segment para public 'code'
 
 		ret
 	print_hex endp
+	
+	print_undec proc
+		mov dx, OFFSET msg_undec_num
+		call print_text
+		call bin_to_undec
+		mov cx, 5
+		mov bx, 0          ;;;;;;;;;;;;;;;
+		loop_out: 
+			mov ah, 2
+			mov dl, undec_number[bx]
+			inc bx
+			int 21h
+			loop loop_out
+		call print_newline
+		ret
+	print_undec endp
 	
 seg_code ends
 end
