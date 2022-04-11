@@ -1,5 +1,6 @@
 public input_choice
 public input_dig
+public number
 extrn error_menu: near
 extrn print_text: near
 extrn print_newline: near
@@ -86,11 +87,9 @@ seg_code segment para public 'code'
 				xor cx, cx
 				mov cl, al ;записали в cx
 				
-				sal bx, 1
-				mov ax, bx
-				sal bx, 1
-				sal bx, 1
-				add bx, ax
+				mov ax, 2
+				mul bx
+				mov bx, ax
 
 				add bx, cx	; к числу прибавляю введенную цифру
 
