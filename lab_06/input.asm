@@ -93,10 +93,6 @@ seg_code segment para public 'code'
 
 				add bx, cx	; к числу прибавляю введенную цифру
 
-				
-				;shl bx, 1
-				;add bx, cx
-
 			jmp input_num_loop	;продолжаем ввод
 		
 		end_input:		;если ввели enter 
@@ -106,13 +102,7 @@ seg_code segment para public 'code'
 			jge wrong
 
 			mov number, bx
-		
-		
-		call print_newline
-		mov dx, offset number
-		call print_text
-		
-		
+
 		ret
 	input_unbin endp
 
