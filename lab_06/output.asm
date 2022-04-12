@@ -1,16 +1,13 @@
 public print_newline
-public print_space
 public print_num
 public print_text
 public print_hex
+public print_undec
 extrn hex_sign: byte
 extrn hex_number: byte
 extrn bin_to_hex: near
 extrn undec_number: byte
 extrn bin_to_undec: near
-public print_undec
-; public print_new_line
-; public print_new_line
 
 seg_data segment para public 'data'
     msg_hex_num db 'Signed hexadecimal number: $'
@@ -29,13 +26,6 @@ seg_code segment para public 'code'
 		ret
 	print_newline endp
 
-	print_space proc
-		mov ah, 02h
-		mov dl, 20h
-		int 21h
-		ret
-	print_space endp
-
 	print_num proc
 		add dl, 30h ;делаем из числа строку
 		mov ah, 02h
@@ -52,31 +42,23 @@ seg_code segment para public 'code'
 	print_hex proc
 		mov dx, OFFSET msg_hex_num
 		call print_text
-		
 		call bin_to_hex
-		
 		mov cx, 4
-		mov bx, 0          ;;;;;;;;;;;;;;;
+		xor bx, bx
 
 		mov dl, hex_sign
-
 		mov ah, 2
 		int 21h
-
+		
 		loop_out: 
 			mov ah, 2
-
 			mov dl, hex_number[bx]
-
 			inc bx
-
 			int 21h
-			
 			loop loop_out
+			
 		call print_newline
-
 		mov hex_sign, ' '
-
 		ret
 	print_hex endp
 	
@@ -85,7 +67,7 @@ seg_code segment para public 'code'
 		call print_text
 		call bin_to_undec
 		mov cx, 5
-		mov bx, 0          ;;;;;;;;;;;;;;;
+		xor bx, bx
 		loop_out: 
 			mov ah, 2
 			mov dl, undec_number[bx]

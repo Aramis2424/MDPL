@@ -1,59 +1,48 @@
 public bin_to_hex
-extrn number: word
 public hex_number
 public hex_sign
+extrn number: word
 
 seg_data segment para public 'data'
     hex_number db 4 dup('0'), '$'
     hex_sign db ' '
-
-    mask16 dw 15
+    four_bit dw 15
 seg_data ends
 
 seg_code segment para public 'code'
-assume cs:seg_code, ds:seg_data
+	assume cs:seg_code, ds:seg_data
 
-bin_to_hex proc
-    mov ax, number
+	bin_to_hex proc
+		mov ax, number
 
-    cmp ax, 32767
-    jbe nosign
+		cmp ax, 32767
+		jbe less
 
-    mov hex_sign, '-'
+		mov hex_sign, '-'
+		sub ax, 1
+		not ax
 
-    sub ax, 1
-    not ax
+		less:
+		mov bx, 3
+		hex_loop:
+			mov dx, ax
+			and dx, four_bit
 
-    nosign:
+			cmp dl, 10
+			jb digit
+			add dl, 7 ;корректируем номер для буквы
 
-    mov bx, 3
+			digit:
+			add dl, '0'
+			mov hex_number[bx], dl
+			mov cl, 4
+			sar ax, cl
 
-    trans_shex:
-        mov dx, ax
-
-        and dx, mask16
-
-        cmp dl, 10
-        jb digit
-
-        add dl, 7
-
-        digit:
-
-        add dl, '0'
-
-        mov hex_number[bx], dl
-
-        mov cl, 4
-        sar ax, cl
-
-        dec bx
-
-        cmp bx, -1
-        jne trans_shex
-
-    ret
-bin_to_hex endp
+			dec bx
+			cmp bx, -1
+			jne hex_loop
+		ret
+	bin_to_hex endp
 
 seg_code ends
 end

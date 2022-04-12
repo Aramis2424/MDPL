@@ -2,15 +2,14 @@
 ;1-е выводимое беззнаковое в 10 с/с
 ;2-е выводимое знаковое в 16 с/с
 
+public error_menu
+public print_menu_loop
 extrn print_text: near
 extrn print_newline: near
 extrn input_choice: near
 extrn input_unbin: near
 extrn print_hex: near
 extrn print_undec: near
-; extrn print_text: near
-public error_menu
-public print_menu_loop
 
 seg_stack segment para stack 'stack'
     db 100 dup (?)
