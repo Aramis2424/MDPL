@@ -58,7 +58,6 @@ seg_code segment para public 'code'
 			loop loop_out
 			
 		call print_newline
-		mov hex_sign, ' '
 		ret
 	print_hex endp
 	
@@ -74,6 +73,7 @@ seg_code segment para public 'code'
 			inc bx
 			int 21h
 			loop loop_out
+			
 		call print_newline
 		ret
 	print_undec endp

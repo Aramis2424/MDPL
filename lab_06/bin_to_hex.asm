@@ -13,6 +13,13 @@ seg_code segment para public 'code'
 	assume cs:seg_code, ds:seg_data
 
 	bin_to_hex proc
+		mov cx, 4
+		mov bx, 3
+		to_zero_loop:
+			mov hex_number[bx], '0'
+			dec bx
+			loop to_zero_loop
+		mov hex_sign, ' '
 		mov ax, number
 
 		cmp ax, 32767
