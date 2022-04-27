@@ -1,0 +1,19 @@
+CC = gcc
+CFLAGS = -Wall -Werror -Wextra -Wpedantic -std=c99 -MMD
+
+SRC_S = $(wildcard *.c)
+OBJ_S = $(SRC_S:.c=.o)
+
+app.exe : $(OBJ_S)
+	$(CC) -o $@ $^
+
+%.o : %.c
+	$(CC) $(CFLAGS) -c $<
+include $(wildcard *.d)
+
+.PHONY : build run clean
+build : app.exe
+run : app.exe
+	./$<
+clean :
+	$(RM) *.exe *.d *.o
