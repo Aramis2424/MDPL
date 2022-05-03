@@ -35,3 +35,30 @@ simple_copy:
 
 exit:
     ret
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+section .text
+global strcopy
+strcopy:
+not_equal:
+    cmp rdi, rsi
+    jl simple_copy  ; если первый операнд МЕНЬШЕ второго операнда - идет простое копирование
+    mov rax, rdi
+    sub rax, rsi    ; вычитаю si из ax
+    cmp rax, rcx
+    jge simple_copy  ; если первый операнд БОЛЬШЕ или РАВЕН второму, то простое копирование
+simple_copy:
+    rep movsb ; Префикс повторения команды   Копирование строк байтов
+    cld       ; Команда CLD в Ассемблере очищает флаг направления (DF)
+exit:
+    ret
