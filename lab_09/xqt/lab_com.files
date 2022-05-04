@@ -2,10 +2,17 @@
 1.h
 2.c
 2.h
+for_32_64.c
+for_32_64.h
+for_80.c
+for_80.h
 graph.c
 graph.h
 in.txt
 main.c
+my_main.h
+my_sin.c
+my_sin.h
 node.c
 node.h
 print.c
