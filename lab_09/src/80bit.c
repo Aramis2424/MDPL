@@ -1,4 +1,4 @@
-#include "fpu.h"
+#include "defines.h"
 
 #ifndef X87
 
