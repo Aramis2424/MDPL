@@ -5,9 +5,9 @@
 #include <time.h>
 #include <math.h>
 
-void print_32bit_result(void);
-void print_64bit_result(void);
-void print_80bit_result(void);
+void res_32(void);
+void res_64(void);
+void res_80(void);
 void sin_cmp(void);
 
 #endif

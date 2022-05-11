@@ -2,10 +2,10 @@
 
 int main(void)
 {
-    print_32bit_result();
-    print_64bit_result();
+    res_32();
+    res_64();
     #ifndef X87
-    print_80bit_result();
+    res_80();
     #endif
 
     sin_cmp();

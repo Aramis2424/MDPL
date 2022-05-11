@@ -38,12 +38,12 @@ double _asm_mul_64bit(double a, double b)
     return mul;
 }
 
-void print_64bit_result(void)
+void res_64(void)
 {
     printf("\n64bit:\n");
 
     double a = 1.232, b = 15e-5, res;
-    int repeat = 1000;
+    int repeat = 20000000;
 
     clock_t begin, end, total;
 
@@ -52,34 +52,34 @@ void print_64bit_result(void)
         res += sum_64bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;
+    total = (end - begin)  ;
 
-    printf("%s %.3g\n", "(SUM): ", total);
+    printf("%s %d\n", "(SUM) std: ", total);
 
     begin = clock();
     for (int i = 0; i < repeat; i++)
         mul_64bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;
+    total = (end - begin)  ;
 
-    printf("%s %.3g\n", "(MUL): ", total);
+    printf("%s %d\n", "(MUL) std: ", total);
 
     begin = clock();
     for (int i = 0; i < repeat; i++)
         res += _asm_sum_64bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;
+    total = (end - begin)  ;
 
-    printf("%s %.3g\n", "(SUM) Assembly insertion: ", total);
+    printf("%s %d\n", "(SUM) asm: ", total);
 
     begin = clock();
     for (int i = 0; i < repeat; i++)
         _asm_mul_64bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;
+    total = (end - begin)  ;
 
-    printf("%s %.3g\n", "(MUL) Assembly insertion: ", total);
+    printf("%s %d\n", "(MUL) asm: ", total);
 }

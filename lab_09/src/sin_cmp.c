@@ -4,7 +4,7 @@
 
 void sin_cmp(void)
 {
-    printf("\nSIN_CMP\n");
+    printf("\n\nSIN_CMP\n");
 
     printf("\nsin(pi)\n\n");
     printf("Lib sin(3.14) = " output_param "\n", sin(3.14));

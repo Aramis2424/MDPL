@@ -38,7 +38,7 @@ float asm_mul_32bit(float a, float b)
     return mul;
 }
 
-void print_32bit_result(void)
+void res_32(void)
 {
     printf("\n32bit:\n");
 
@@ -53,34 +53,34 @@ void print_32bit_result(void)
         res += sum_32bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;
+    total = (double)(end - begin) ;
 
-    printf("%s %.3g\n", "(SUM): ", total);
+    printf("%s %.3g\n", "(SUM) std: ", total);
 
     begin = clock();
     for (int i = 0; i < repeat; i++)
         mul_32bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;;
+    total = (double)(end - begin)  ;
 
-    printf("%s %.3g\n", "(MUL): ", total);
+    printf("%s %.3g\n", "(MUL) std: ", total);
 
     begin = clock();
     for (int i = 0; i < repeat; i++)
         res += asm_sum_32bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;;
+    total = (double)(end - begin)  ;
 
-    printf("%s %.3g\n", "(SUM) Assembly insertion: ", total);
+    printf("%s %.3g\n", "(SUM) asm: ", total);
 
     begin = clock();
     for (int i = 0; i < repeat; i++)
         asm_mul_32bit(a, b);
     end = clock();
 
-    total = (double)(end - begin) / CLOCKS_PER_SEC / repeat;;
+    total = (double)(end - begin)  ;
 
-    printf("%s %.3g\n", "(MUL) Assembly insertion: ", total);
+    printf("%s %.3g\n", "(MUL) asm: ", total);
 }
