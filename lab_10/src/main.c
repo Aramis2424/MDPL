@@ -1,8 +1,8 @@
-#include "scalar_prod.h"
+#include "vector_sum.h"
 
 int main(void)
 {
-    testing();
-    time_measuring();
+    testing_sum();
+    time_measuring_sum();
     return 0;
 }
