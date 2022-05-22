@@ -96,12 +96,17 @@ section '.rsrc' resource data readable
   resource dialogs,\
            37,LANG_ENGLISH+SUBLANG_DEFAULT,demonstration
 
-  dialog demonstration,'Calculate digit sum',70,70,190,175,WS_CAPTION+WS_POPUP+WS_SYSMENU+DS_MODALFRAME
-    dialogitem 'STATIC','&First digit:',-1,10,10,70,8,WS_VISIBLE
-    dialogitem 'EDIT','',ID_FIRSTDIG,10,20,170,13,WS_VISIBLE+WS_BORDER+WS_TABSTOP
+  ; Формат определения размеров объектов: X1,Y1, X2,<Высота>
+  dialog demonstration,'Sum of digits',70,70,190,175,WS_CAPTION+WS_POPUP+WS_SYSMENU+DS_MODALFRAME ; Окно программы
+  
+    dialogitem 'STATIC','&First digit:',-1,10,10,70,8,WS_VISIBLE ; Надпись
+    dialogitem 'EDIT','',ID_FIRSTDIG,10,20,170,15,WS_VISIBLE+WS_BORDER+WS_TABSTOP ; Окно ввода
+	
     dialogitem 'STATIC','&Second digit:',-1,10,40,70,8,WS_VISIBLE
-    dialogitem 'EDIT','',ID_SECONDDIG,10,50,170,13,WS_VISIBLE+WS_BORDER+WS_TABSTOP
-	dialogitem 'STATIC','&Result of digit sum:',-1,10,70,70,8,WS_VISIBLE
-    dialogitem 'EDIT','',ID_RES,10,80,170,13,WS_VISIBLE+WS_BORDER+WS_TABSTOP
-    dialogitem 'BUTTON','OK',IDOK,135,150,45,15,WS_VISIBLE+WS_TABSTOP+BS_DEFPUSHBUTTON
+    dialogitem 'EDIT','',ID_SECONDDIG,10,50,170,15,WS_VISIBLE+WS_BORDER+WS_TABSTOP
+	
+	dialogitem 'BUTTON','Sum digits!',IDOK,10,80,170,15,WS_VISIBLE+WS_TABSTOP+BS_DEFPUSHBUTTON ; Кнопка
+	
+	dialogitem 'STATIC','&Result:',-1,110,70,70,8,WS_VISIBLE
+    dialogitem 'EDIT','',ID_RES,10,120,170,15,WS_VISIBLE+WS_BORDER+WS_TABSTOP
   enddialog
